@@ -1,0 +1,35 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: powerfone
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+
+  backend:
+    build: ./backend
+    environment:
+      - DB_URL=postgres://postgres:postgres@db:5432/powerfone
+      - PORT=5000
+      - FRONTEND_URL=http://localhost:3000
+    ports:
+      - '5000:5000'
+    depends_on:
+      - db
+
+  frontend:
+    build: ./frontend
+    environment:
+      - REACT_APP_BACKEND_URL=http://localhost:5000
+    ports:
+      - '3000:3000'
+    depends_on:
+      - backend
+
+volumes:
+  db-data:
